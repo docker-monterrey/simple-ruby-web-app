@@ -1,0 +1,34 @@
+version: "2"
+
+services:
+
+  web:
+    # La sección 'build' en conjunto con la sección 'image' nos permite crear una imagen a partir
+    # de los comandos del archivo Dockerfile señalado, con el nombre de imagen que definamos:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    image: docker-monterrey/simple-ruby-web-app:development
+
+    command: rackup -o 0.0.0.0 hello-world.ru
+
+    ports:
+      - 3000:9292
+
+    # La sección de 'volumes' nos permite montar directorios y archivos de nuestro Host dentro de
+    # nuestros containers - especialmente código -, así como también volúmenes definidos en la
+    # sección de 'volumes', e incluso volúmenes definidos por algún otro contenedor:
+    volumes:
+      # Montamos el directorio actual - que contiene el código de la app - dentro de nuestro
+      # contenedor de aplicación:
+      - .:/usr/src/app
+
+    # Mantiene STDIN abierto, para que nosotros podamos conectar nuestras terminales a el proceso de
+    # nuestro contenedor, y así poder debuggear la app usando byebug, etc:
+    stdin_open: true
+
+    # Habilita el que podamos enviar señales de proceso (CTRL+C, CTRL+P + CTRL+Q) hacia el contenedor:
+    tty: true
+
+    environment:
+      DATABASE_URL: postgres://no:hay@algun-servidor-de-postgres.com:5432/base_datos_01
